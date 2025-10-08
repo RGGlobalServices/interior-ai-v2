@@ -215,6 +215,7 @@ def create_app():
 
 
 if __name__ == "__main__":
-    app = create_app()
-    # It is recommended to run on port 5000 for the frontend proxy to work seamlessly
-    app.run(port=5000, debug=True)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
