@@ -1,8 +1,8 @@
-Flask==2.3.2
-Flask-SQLAlchemy==3.0.3
-python-dotenv==1.0.0
-openai==1.0.0
-pymupdf>=1.23.6
+Flask
+Flask-SQLAlchemy
+python-dotenv
+openai
+pymupdf
 opencv-python-headless 
 ezdxf                 
 python-docx
