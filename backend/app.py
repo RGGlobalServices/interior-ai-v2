@@ -61,8 +61,7 @@ def create_app():
 
     with app.app_context():
         db.create_all()
-    # ---------------- Create app for Gunicorn ----------------
-    app = create_app()
+    
     # ---------------- API ROUTES ----------------
     # 🎯 2. API ROUTES MUST COME FIRST to avoid being caught by the frontend router
    
@@ -214,7 +213,8 @@ def create_app():
         return render_template("index.html")
 
     return app
-
+# ---------------- Create app for Gunicorn ----------------
+    app = create_app()
 # ---------------- Run locally ----------------
 if __name__ == "__main__":
     import os
