@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import * as pdfjsLib from "pdfjs-dist";
 import html2canvas from "html2canvas";
 
-// 🚀 FIX 1: Using a stable version of the PDF.js worker to resolve the 404 error.
+// Use stable PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.269/pdf.worker.min.js`;
 
 const AnnotationEditor = () => {
@@ -11,53 +11,50 @@ const AnnotationEditor = () => {
     const location = useLocation();
 
     const { fileName, filePath, projectId = "default_project_1" } = location.state || {};
-    
-    // Refs
+
     const pdfCanvasRef = useRef(null);
     const overlayRef = useRef(null);
     const canvasWrapperRef = useRef(null);
-    
-    // State
+
     const [currentTool, setCurrentTool] = useState("pan");
     const [currentColor, setCurrentColor] = useState("#5c6bc0");
     const [currentStrokeWidth, setCurrentStrokeWidth] = useState(4);
-    const [scaleRatio, setScaleRatio] = useState(0.05); // m/px (Crucial for measurements!)
+    const [scaleRatio, setScaleRatio] = useState(0.05);
     const [currentZoom, setCurrentZoom] = useState(1.0);
-    
-    // Measurement State: Tracks points for multi-click tools (like Angle)
-    const [measurementPoints, setMeasurementPoints] = useState([]); 
-    
-    // Drawing State
+
+    const [measurementPoints, setMeasurementPoints] = useState([]);
     const [isDrawing, setIsDrawing] = useState(false);
     const [startX, setStartX] = useState(0);
     const [startY, setStartY] = useState(0);
     const [lastX, setLastX] = useState(0);
     const [lastY, setLastY] = useState(0);
-    
-    // History State
+
     const [historyStack, setHistoryStack] = useState([]);
     const [historyIndex, setHistoryIndex] = useState(-1);
 
-    // --- Utility & History Functions ---
+    // --- Utility Functions ---
+    const getCanvasCoords = useCallback(
+        (e) => {
+            const rect = overlayRef.current.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / currentZoom;
+            const y = (e.clientY - rect.top) / currentZoom;
+            return { x, y };
+        },
+        [currentZoom]
+    );
 
-    const getCanvasCoords = useCallback((e) => {
-        const rect = overlayRef.current.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / currentZoom;
-        const y = (e.clientY - rect.top) / currentZoom;
-        return { x, y };
-    }, [currentZoom]);
-
-    const redrawHistory = (index) => {
-        const ctx = overlayRef.current.getContext('2d');
-        ctx.clearRect(0, 0, overlayRef.current.width, overlayRef.current.height);
-        if (index >= 0) {
-            const img = new Image();
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0);
-            };
-            img.src = historyStack[index];
-        }
-    };
+    const redrawHistory = useCallback(
+        (index) => {
+            const ctx = overlayRef.current.getContext("2d");
+            ctx.clearRect(0, 0, overlayRef.current.width, overlayRef.current.height);
+            if (index >= 0) {
+                const img = new Image();
+                img.onload = () => ctx.drawImage(img, 0, 0);
+                img.src = historyStack[index];
+            }
+        },
+        [historyStack]
+    );
 
     const saveHistory = useCallback(() => {
         const newStack = historyStack.slice(0, historyIndex + 1);
@@ -66,104 +63,82 @@ const AnnotationEditor = () => {
         setHistoryIndex(newStack.length);
     }, [historyStack, historyIndex]);
 
-    const handleUndo = () => historyIndex > -1 && setHistoryIndex(prev => prev - 1);
-    const handleRedo = () => historyIndex < historyStack.length - 1 && setHistoryIndex(prev => prev + 1);
-    
+    const handleUndo = () => historyIndex > -1 && setHistoryIndex((prev) => prev - 1);
+    const handleRedo = () => historyIndex < historyStack.length - 1 && setHistoryIndex((prev) => prev + 1);
+
     useEffect(() => {
         if (overlayRef.current) redrawHistory(historyIndex);
-    }, [historyIndex]);
-    
-    // --- Measurement Helpers ---
-    
+    }, [historyIndex, redrawHistory]);
+
     const calculateDistance = (p1, p2) => {
         const dx = p2.x - p1.x;
         const dy = p2.y - p1.y;
         const distancePx = Math.sqrt(dx * dx + dy * dy);
-        // Convert pixels to meters (or whatever unit based on scaleRatio)
-        const distanceM = distancePx * scaleRatio;
-        return distanceM.toFixed(2);
+        return (distancePx * scaleRatio).toFixed(2);
     };
 
     const drawMeasurementText = (ctx, start, end, distance) => {
-        // Calculate mid-point for text
         const midX = (start.x + end.x) / 2;
         const midY = (start.y + end.y) / 2;
-
-        // Calculate angle for text rotation
         const angleRad = Math.atan2(end.y - start.y, end.x - start.x);
 
         ctx.save();
         ctx.translate(midX, midY);
         ctx.rotate(angleRad);
-        
-        // Draw background rectangle for text for readability
+
         const text = `${distance} m`;
         ctx.font = `bold ${12 / currentZoom}px Arial`;
-        ctx.fillStyle = 'white';
-        // Draw rectangle slightly above the line
-        ctx.fillRect(-ctx.measureText(text).width / 2 - 5, -20 / currentZoom, ctx.measureText(text).width + 10, 16 / currentZoom); 
+        ctx.fillStyle = "white";
+        ctx.fillRect(-ctx.measureText(text).width / 2 - 5, -20 / currentZoom, ctx.measureText(text).width + 10, 16 / currentZoom);
 
-        // Draw the text
-        ctx.fillStyle = 'black';
-        ctx.textAlign = 'center';
-        ctx.fillText(text, 0, -5 / currentZoom); // Position text in the box
-        
+        ctx.fillStyle = "black";
+        ctx.textAlign = "center";
+        ctx.fillText(text, 0, -5 / currentZoom);
+
         ctx.restore();
     };
 
     const calculateAngleDeg = (p1, p2, p3) => {
-        // p1: Leg Start, p2: Vertex, p3: Leg End
         const v1x = p1.x - p2.x;
         const v1y = p1.y - p2.y;
         const v2x = p3.x - p2.x;
         const v2y = p3.y - p2.y;
-        
+
         const angle1 = Math.atan2(v1y, v1x);
         const angle2 = Math.atan2(v2y, v2x);
         let angle = Math.abs(angle1 - angle2);
         if (angle > Math.PI) angle = 2 * Math.PI - angle;
-        
-        return (angle * 180 / Math.PI).toFixed(1);
-    }
-    
+        return (angle * 180) / Math.PI;
+    };
+
     const drawAngleMarker = (ctx, p1, p2, p3) => {
         const angleDeg = calculateAngleDeg(p1, p2, p3);
         const angle1 = Math.atan2(p1.y - p2.y, p1.x - p2.x);
         const angle2 = Math.atan2(p3.y - p2.y, p3.x - p2.x);
-        
-        const radius = 30 / currentZoom; 
-        
-        // Normalize angles for correct arc drawing
+
+        const radius = 30 / currentZoom;
+
         let startAngle = angle1;
         let endAngle = angle2;
         if (startAngle > endAngle) [startAngle, endAngle] = [endAngle, startAngle];
+        if (Math.abs(angle2 - angle1) > Math.PI) [startAngle, endAngle] = [endAngle, startAngle];
 
-        // Handle case where angle crosses the 0/360 boundary (e.g., 350 deg to 10 deg)
-        if (angle2 - angle1 > Math.PI || angle1 - angle2 > Math.PI) {
-            // Swap start and end for the small arc
-            [startAngle, endAngle] = [endAngle, startAngle];
-        }
-
-        // Draw the arc
         ctx.beginPath();
-        ctx.strokeStyle = 'red';
+        ctx.strokeStyle = "red";
         ctx.lineWidth = 2 / currentZoom;
         ctx.arc(p2.x, p2.y, radius, startAngle, endAngle);
         ctx.stroke();
 
-        // Draw the text
-        ctx.fillStyle = 'red';
+        ctx.fillStyle = "red";
         ctx.font = `bold ${14 / currentZoom}px Arial`;
         const textRadius = radius + 15 / currentZoom;
         const textAngle = (angle1 + angle2) / 2;
-        
         const textX = p2.x + textRadius * Math.cos(textAngle);
         const textY = p2.y + textRadius * Math.sin(textAngle);
 
-        ctx.textAlign = 'center';
-        ctx.fillText(`${angleDeg}°`, textX, textY);
+        ctx.textAlign = "center";
+        ctx.fillText(`${angleDeg.toFixed(1)}°`, textX, textY);
     };
-    
     // --- Tool Handlers ---
 
     const handleToolStart = (e) => {
