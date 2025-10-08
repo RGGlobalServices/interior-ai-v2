@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="workspace-section" id="pricing">
+  <div class="section-card" role="region" aria-label="Pricing Section">
+    <h2 class="section-title">Pricing</h2>
+    <p class="section-subtitle">Start and manage your projects</p>
+    <button class="action-btn-3d" id="newProjectBtn" aria-label="Create New Project">
+      Create New Project
+    </button>
+    <div class="task-list" id="projectList" aria-live="polite">
+      <p class="placeholder-text">No projects yet. Start by creating one!</p>
+    </div>
+    <div class="status-message" id="projectStatus" aria-live="polite"></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,7 @@
+# Ignore environment and sensitive files
+backend/.env
+backend/config.py
+*.pyc
+__pycache__/
+.env
+node_modules

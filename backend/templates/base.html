@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KABS Interior</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <div class="main-container">
+    <!-- Sidebar -->
+    <div class="main-sidebar" role="navigation" aria-label="Main Menu">
+      <div class="logo">KABS</div>
+      <button class="nav-btn-3d" data-page="pricing" data-tooltip="Pricing" aria-label="Go to Pricing" aria-current="false">
+        Pricing
+      </button>
+      <button class="nav-btn-3d" data-page="annotation" data-tooltip="Annotation" aria-label="Go to Annotation" aria-current="false">
+        Annotation
+      </button>
+      <button class="nav-btn-3d" data-page="discussion" data-tooltip="Discussion" aria-label="Go to Discussion" aria-current="false">
+        Discussion
+      </button>
+      <div class="help-tooltip" role="dialog" aria-hidden="true">
+        <p>Welcome to KABS Interior! Click a button to start.</p>
+        <button class="help-close" aria-label="Close Help">×</button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-area">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+Flask==2.3.2
+Flask-SQLAlchemy==3.0.3
+python-dotenv==1.0.0
+openai==1.0.0
+pymupdf>=1.23.6
+opencv-python-headless 
+ezdxf                 
+python-docx
+reportlab
+flask-cors
+psycopg2-binary
+PyMuPDF
+gunicorn
+Werkzeug
+requests
+pdf2image

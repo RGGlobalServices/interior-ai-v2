@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="workspace-section" id="annotation">
+  <div class="section-card" role="region" aria-label="Annotation Section">
+    <h2 class="section-title">Annotation</h2>
+    <p class="section-subtitle">Import and annotate your designs</p>
+    <button class="action-btn-3d add-file-box-3d" id="addPdfFileBtn" aria-label="Upload PDF File">
+      <span class="add-file-icon-btn">Upload PDF</span>
+    </button>
+    <button class="action-btn-3d" id="openEditorBtn" disabled aria-label="Open 3D Editor">
+      Open 3D Editor
+    </button>
+    <div class="recent-files" role="region" aria-live="polite">
+      <p class="recent-title">Recent Files</p>
+      <p class="placeholder-text">No recent files available.</p>
+    </div>
+    <div class="status-message" id="fileStatus" aria-live="polite"></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="workspace-section" id="discussion">
+  <div class="section-card" role="region" aria-label="Discussion Section">
+    <h2 class="section-title">Discussion</h2>
+    <p class="section-subtitle">Chat with your AI designer</p>
+    <div class="chat-messages" id="chatMessages" aria-live="polite">
+      <div class="msg ai">Hello! How can I assist you with your design today?</div>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chatInput" placeholder="Type your message..." aria-label="Chat Input" />
+      <button class="send-btn-3d" id="sendMsg" aria-label="Send Message">Send</button>
+    </div>
+    <div class="status-message" id="chatStatus" aria-live="polite"></div>
+  </div>
+</div>
+{% endblock %}

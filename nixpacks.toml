@@ -1,0 +1,5 @@
+[packages]
+# Add the MuPDF library dependencies which PyMuPDF requires for compilation.
+# 'mupdf' and 'openssl' are often required for successful compilation of heavy packages.
+# 'gcc' and 'python3-dev' are common build tools. Railway might include them by default, but adding 'mupdf' is key.
+aptPkgs = ["...", "mupdf"]
