@@ -1,15 +1,15 @@
 import os
-import mimetypes
-import openai
-import base64
 from flask import Flask, render_template, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
-from db import db
-from models import Project, Annotation, Discussion, Report
-from utils import save_upload, project_folder
 from fpdf import FPDF
+import openai
 
-# ✅ Load environment variables (Render will automatically inject them)
+# Import your database and models
+from backend.db import db
+from backend.models import Project, Annotation, Discussion, Report
+from backend.utils import save_upload, project_folder
+
+# Load environment variables
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///local.db")
 
