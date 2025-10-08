@@ -211,8 +211,6 @@ def create_app():
         # Flask serves the React index.html for all non-API routes, letting React Router take over.
         return render_template("index.html")
 
-    return app
-
   app = create_app()
 
 # ---------------- Run locally ----------------
