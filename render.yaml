@@ -1,13 +1,21 @@
+# render.yaml for Interior-AI project
+
 services:
   - type: web
     name: interior-ai
     env: python
+    plan: free
+    region: oregon
     buildCommand: |
-      cd frontend && npm install && npm run build && cd ../backend && pip install -r requirements.txt
-    startCommand: gunicorn backend.app:app --bind 0.0.0.0:$PORT
+      pip install -r requirements.txt
+      cd frontend
+      npm install
+      npm run build
+      cd ..
+    startCommand: cd backend && gunicorn -w 4 -b 0.0.0.0:$PORT app:app
     envVars:
-      - key: SQLALCHEMY_DATABASE_URI
-        value: "your-database-uri-here"
-      - key: OPENAI_API_KEY
-        value: "your-openai-key-here"
-    plan: free  # or starter/pro depending on your needs
+      - key: FLASK_ENV
+        value: production
+      # Add your database URL if needed
+      # - key: DATABASE_URL
+      #   value: your_database_url_here
