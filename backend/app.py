@@ -213,8 +213,9 @@ def create_app():
 
     return app
 
-   app = create_app()
+  app = create_app()
 
+# ---------------- Run locally ----------------
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 5000))
