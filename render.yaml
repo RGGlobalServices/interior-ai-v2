@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: interior-ai
+    env: python
+    buildCommand: |
+      cd frontend && npm install && npm run build && cd ../backend && pip install -r requirements.txt
+    startCommand: gunicorn backend.app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: SQLALCHEMY_DATABASE_URI
+        value: "your-database-uri-here"
+      - key: OPENAI_API_KEY
+        value: "your-openai-key-here"
+    plan: free  # or starter/pro depending on your needs
