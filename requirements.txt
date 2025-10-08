@@ -14,5 +14,5 @@ gunicorn
 Werkzeug
 requests
 pdf2image
-fpdf
+fpdf2
 
