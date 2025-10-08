@@ -1,1 +1,1 @@
-git push origin main --force
+web: gunicorn app:create_app()
