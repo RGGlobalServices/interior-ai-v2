@@ -1,17 +1,20 @@
-from flask import Flask, render_template, request, jsonify, send_file
+import os
+import mimetypes
+import openai
+import base64
+from flask import Flask, render_template, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
 from db import db
 from models import Project, Annotation, Discussion, Report
 from utils import save_upload, project_folder
-import openai, os, uuid
-from flask import send_from_directory
-# Import mimetypes to correctly guess content types for images/PDFs
-import mimetypes 
-openai.api_key = OPENAI_API_KEY
-import os
+from fpdf import FPDF
 
-SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
+# ✅ Load environment variables (Render will automatically inject them)
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///local.db")
+
+# Initialize OpenAI API key
+openai.api_key = OPENAI_API_KEY
 
 def create_app():
     # Calculate the base directory of this script (app.py)
