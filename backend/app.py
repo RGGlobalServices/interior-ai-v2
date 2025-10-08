@@ -7,10 +7,11 @@ import openai, os, uuid
 from flask import send_from_directory
 # Import mimetypes to correctly guess content types for images/PDFs
 import mimetypes 
-from config import SQLALCHEMY_DATABASE_URI, OPENAI_API_KEY
-import os
 openai.api_key = OPENAI_API_KEY
+import os
 
+SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 def create_app():
     # Calculate the base directory of this script (app.py)
