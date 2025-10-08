@@ -1,12 +1,13 @@
 from flask import Flask, render_template, request, jsonify, send_file
 from flask_cors import CORS
-from .db import db
-from .models import Project, Annotation, Discussion, Report
-from .utils import save_upload, project_folder
-from .config import SQLALCHEMY_DATABASE_URI, OPENAI_API_KEY
+from db import db
+from models import Project, Annotation, Discussion, Report
+from utils import save_upload, project_folder
 import openai, os, uuid
 from flask import send_from_directory
+# Import mimetypes to correctly guess content types for images/PDFs
 import mimetypes 
+from config import SQLALCHEMY_DATABASE_URI, OPENAI_API_KEY
 import os
 openai.api_key = OPENAI_API_KEY
 
@@ -65,13 +66,12 @@ def create_app():
      build_dir = os.path.join(os.path.dirname(__file__), 'frontend', 'build')
      return send_from_directory(build_dir, 'index.html')
 
-    @app.route("/", defaults={"path": ""})
-    @app.route("/<path:path>")
-    def serve_react_app(path):
-     build_dir = os.path.join(os.path.dirname(__file__), "frontend", "build")
-     if path != "" and os.path.exists(os.path.join(build_dir, path)):
+    @app.route('/<path:path>')
+    def serve_static_files(path):
+     build_dir = os.path.join(os.path.dirname(__file__), 'frontend', 'build')
+     if os.path.exists(os.path.join(build_dir, path)):
         return send_from_directory(build_dir, path)
-     return send_from_directory(build_dir, "index.html")
+     return send_from_directory(build_dir, 'index.html')
 
     @app.route("/api/projects", methods=["GET", "POST"])
     def projects():
