@@ -203,20 +203,18 @@ def create_app():
         except Exception as e:
             return jsonify({"success": False, "message": str(e)}), 500
     
-    # ---------------- FRONTEND CATCH-ALL ROUTE ----------------
-    # 🎯 3. This route is last and catches all requests that didn't match an API route.
-    @app.route("/", defaults={"path": ""})
-    @app.route("/<path:path>")
-    def serve_react_app(path):
-        # Flask serves the React index.html for all non-API routes, letting React Router take over.
-        return render_template("index.html")
+  # ---------------- FRONTEND CATCH-ALL ROUTE ----------------
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_react_app(path):
+    return render_template("index.html")
 
-  app = create_app()
+# ---------------- Create app for Gunicorn ----------------
+app = create_app()
 
 # ---------------- Run locally ----------------
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
 
